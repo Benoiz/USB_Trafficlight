@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-//This class comes from the cleware homepage. It imports the "USBAccess.dll"
+//This class comes from the cleware homepage. It imports the needed "USBAccess.dll"
 
 namespace USB_Trafficlight
 {

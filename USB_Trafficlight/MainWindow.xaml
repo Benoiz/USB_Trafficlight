@@ -1,11 +1,11 @@
-﻿<Window x:Class="USB_Trafficlight.MainWindow"
+﻿<Window x:Name="MainWindow1" x:Class="USB_Trafficlight.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:USB_Trafficlight"
         mc:Ignorable="d"
-        Title="Duel Mode Training Sofware" Height="250" Width="300" MinHeight="250" MinWidth="300">
+        Title="Duel Mode Training Sofware" Height="250" Width="300" MinHeight="250" MinWidth="300" Closing="MainWindow_Closing">
     <Grid>
         <Button x:Name="button_start" Content="Start" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Margin="22,76,0,0" Height="88" Click="Button_Start_Click"/>
         <Label x:Name="label_status" Content="" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,20,0,0" Width="140" Height="34" />

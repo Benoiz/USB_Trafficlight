@@ -10,43 +10,66 @@ namespace USB_Trafficlight
 {
     public class Duel_Mode
     {
-        public void InitiateDuelMode()
+        private readonly IntPtr cwObj = default;
+
+        private static readonly int PREPARATION_TIME = 60000;
+        private static readonly int AVERTED_TIME = 7000;
+        private static readonly int FACED_TIME = 3000;
+        private bool ResetStatus { get; set; } = false;
+
+        public Duel_Mode ()     //contructor is called when class is intantiated
         {
             try
             {
-                IntPtr cwObj = CwUSB.FCWInitObject();
+                cwObj = CwUSB.FCWInitObject();
                 int devCount = CwUSB.FCWOpenCleware(cwObj);
                 // Please note that OpenCleware should be called only once in the
                 // initialisation of your programm, not every time a function is called
                 Console.WriteLine("Found " + devCount + " Cleware devices");
                 int devType = CwUSB.FCWGetUSBType(cwObj, 0);
-                Console.WriteLine(devType );
+                Console.WriteLine(devType);
 
                 if (devType == (int)CwUSB.USBtype_enum.SWITCH1_DEVICE)
                 {
                     //CwUSB.FCWSetLED(cwObj, 8, (int)CwUSB.LED_IDs.LED_1, 1);
                     int state = CwUSB.FCWGetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1); // for debugging
                     Console.WriteLine(state); //0 is off, 1 is on and -1 is a failure
-                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
-                    System.Threading.Thread.Sleep(60000);
-                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadKey();
+                Environment.Exit(1);
+            }
+        }
+        public void InitiateDuelMode()
+        {
+            try
+            {
+
+                int devCount = CwUSB.FCWOpenCleware(cwObj);
+                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
+                System.Threading.Thread.Sleep(PREPARATION_TIME);
+                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
+
+                //loop of 5 because of 5 rounds
+                while (ResetStatus == false)
+                {
                     for (int i = 0; i < 4; i++)
                     {
                         CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
-                        System.Threading.Thread.Sleep(7000);
+                        System.Threading.Thread.Sleep(AVERTED_TIME);
                         CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
                         CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 1); //turning the green light on
-                        System.Threading.Thread.Sleep(3000);
+                        System.Threading.Thread.Sleep(FACED_TIME);
                         CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
-                        
                     }
+
+                    // checking if a device is connected before closing a connection
+                    CloseConnection();
                 }
 
-                if (devCount >= 1)
-                {
-                    CwUSB.FCWCloseCleware(cwObj); // freeing the object
-                    CwUSB.FCWUnInitObject(cwObj);
-                }
             }
             catch (Exception e)
             {
@@ -55,11 +78,27 @@ namespace USB_Trafficlight
         }
         public void ResetMode()
         {
-            IntPtr cwObj = CwUSB.FCWInitObject();
-            //int devCount = CwUSB.FCWOpenCleware(cwObj);
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+            ResetStatus = true;
+            int devCount = CwUSB.FCWOpenCleware(cwObj);
+
+            if (devCount >= 1)
+            {
+                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
+                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
+                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+            }
+            ResetStatus = false;
+        }
+
+        public void CloseConnection()
+        {
+            int devCount = CwUSB.FCWOpenCleware(cwObj);
+
+            if (devCount >= 1)
+            {
+                CwUSB.FCWCloseCleware(cwObj);
+                CwUSB.FCWUnInitObject(cwObj);
+            }
         }
     }
 }
