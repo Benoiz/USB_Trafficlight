@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Runtime.InteropServices;
+using System.Windows.Controls;
 
 namespace USB_Trafficlight
 {
@@ -12,10 +13,10 @@ namespace USB_Trafficlight
     {
         private readonly IntPtr cwObj = default;
 
-        private static readonly int PREPARATION_TIME = 60000;
-        private static readonly int AVERTED_TIME = 7000;
-        private static readonly int FACED_TIME = 3000;
-        private bool ResetStatus { get; set; } = false;
+        private const int PREPARATION_TIME = 6000;
+        private const int AVERTED_TIME = 7000;
+        private const int FACED_TIME = 3000;
+        private bool ResetStatus = false;
 
         public Duel_Mode ()     //contructor is called when class is intantiated
         {
@@ -35,11 +36,16 @@ namespace USB_Trafficlight
                     int state = CwUSB.FCWGetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1); // for debugging
                     Console.WriteLine(state); //0 is off, 1 is on and -1 is a failure
                 }
+
+                if (devCount < 1)
+                {
+                    MessageBox.Show("no device connected!");
+                    Environment.Exit(1);
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                Console.ReadKey();
+                MessageBox.Show(e.Message);
                 Environment.Exit(1);
             }
         }
@@ -47,8 +53,7 @@ namespace USB_Trafficlight
         {
             try
             {
-
-                int devCount = CwUSB.FCWOpenCleware(cwObj);
+                ResetStatus = false;
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
                 System.Threading.Thread.Sleep(PREPARATION_TIME);
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
@@ -66,10 +71,8 @@ namespace USB_Trafficlight
                         CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
                     }
 
-                    // checking if a device is connected before closing a connection
-                    CloseConnection();
+                    ResetStatus = true;
                 }
-
             }
             catch (Exception e)
             {
@@ -87,7 +90,6 @@ namespace USB_Trafficlight
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
             }
-            ResetStatus = false;
         }
 
         public void CloseConnection()
