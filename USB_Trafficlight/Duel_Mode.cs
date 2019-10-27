@@ -59,18 +59,24 @@ namespace USB_Trafficlight
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
 
                 //loop of 5 because of 5 rounds
-                while (ResetStatus == false)
+                while(ResetStatus == false)
                 {
-                    for (int i = 0; i < 4; i++)
+                    for(int i = 0; i < 4; i++)
                     {
-                        CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
-                        System.Threading.Thread.Sleep(AVERTED_TIME);
-                        CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
-                        CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 1); //turning the green light on
-                        System.Threading.Thread.Sleep(FACED_TIME);
-                        CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+                        if(ResetStatus == false) // abort if reset button is triggered
+                        {
+                            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
+                            System.Threading.Thread.Sleep(AVERTED_TIME);
+                            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
+                        }
+                        
+                        if (ResetStatus == false)
+                        {
+                            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 1); //turning the green light on
+                            System.Threading.Thread.Sleep(FACED_TIME);
+                            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+                        }
                     }
-
                     ResetStatus = true;
                 }
             }
