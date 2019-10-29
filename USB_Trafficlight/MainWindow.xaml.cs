@@ -22,6 +22,7 @@ namespace USB_Trafficlight
         private async void Button_Start_Click(object sender, RoutedEventArgs e)
         {
             button_start.IsEnabled = false;
+            TextBox_Status.Text = "duel mode started";
             var result = await Task.Run(() =>
             {
                 CWOBJ.InitiateDuelMode();
