@@ -50,21 +50,8 @@ namespace USB_Trafficlight
             }
         }
 
-         public async Task InitiateDuelMode(CancellationToken ct)
+        public async Task<string> InitiateDuelMode()
         {
-            try
-            {   
-                ct.Register(() =>
-                {
-                    try
-                    {
-                        ct.ThrowIfCancellationRequested();
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw new OperationCanceledException(ct);
-                    }
-                });
 
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
                 await Task.Delay(PREPARATION_TIME);
@@ -82,34 +69,38 @@ namespace USB_Trafficlight
                     await Task.Delay(FACED_TIME);
                     CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            return "done";
         }
 
-        public void ResetMode()
+        public async Task<string> ResetMode()
         {
-            int devCount = CwUSB.FCWOpenCleware(cwObj);
-
-            if (devCount >= 1)
+            await Task.Run(() =>
             {
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
-            }
+                int devCount = CwUSB.FCWOpenCleware(cwObj);
+
+                if (devCount >= 1)
+                {
+                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
+                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
+                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+                }
+            });
+            return "reset done";
         }
 
-        public void CloseConnection()
+        public async Task CloseConnection()
         {
-            int devCount = CwUSB.FCWOpenCleware(cwObj);
-
-            if (devCount >= 1)
+            await Task.Run(() =>
             {
-                CwUSB.FCWCloseCleware(cwObj);
-                CwUSB.FCWUnInitObject(cwObj);
-            }
+                int devCount = CwUSB.FCWOpenCleware(cwObj);
+
+                if (devCount >= 1)
+                {
+                    CwUSB.FCWCloseCleware(cwObj);
+                    CwUSB.FCWUnInitObject(cwObj);
+                }
+            });
+
         }
     }
 }
