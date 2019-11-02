@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Windows;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using System.Windows.Controls;
 using System.Threading;
 
 namespace USB_Trafficlight
@@ -26,6 +21,7 @@ namespace USB_Trafficlight
                 int devCount = CwUSB.FCWOpenCleware(cwObj);
                 // Please note that OpenCleware should be called only once in the
                 // initialisation of your programm, not every time a function is called
+                
                 Console.WriteLine("Found " + devCount + " Cleware devices");
                 int devType = CwUSB.FCWGetUSBType(cwObj, 0);
                 Console.WriteLine(devType);
@@ -50,26 +46,33 @@ namespace USB_Trafficlight
             }
         }
 
-        public async Task<string> InitiateDuelMode()
+        public async Task<string> InitiateDuelMode(CancellationToken ct)
         {
-
+            while (true)
+            {
+                if (ct.IsCancellationRequested) // Is cancellation request already true
+                {
+                    ct.ThrowIfCancellationRequested();
+                }
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
-                await Task.Delay(PREPARATION_TIME);
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
+                await Task.Delay(PREPARATION_TIME, ct);
+                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0); // and off
 
                 //loop of 5 because of 5 rounds
 
                 for (int i = 0; i < 4; i++)
                 {
                     CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
-                    await Task.Delay(AVERTED_TIME);
-                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
+                    await Task.Delay(AVERTED_TIME, ct);
+                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0); // and off
 
                     CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 1); //turning the green light on
-                    await Task.Delay(FACED_TIME);
-                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+                    await Task.Delay(FACED_TIME, ct);
+                    CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0); // and off
                 }
-            return "done";
+                return "done";
+            }
+
         }
 
         public async Task<string> ResetMode()
