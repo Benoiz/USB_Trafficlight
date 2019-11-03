@@ -45,6 +45,7 @@ namespace USB_Trafficlight
                 cts.Dispose(); // free ressources
             }
 
+            button_reset.IsEnabled = false;
             button_start.IsEnabled = true;
         }
 
