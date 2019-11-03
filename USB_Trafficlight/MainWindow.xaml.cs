@@ -30,7 +30,7 @@ namespace USB_Trafficlight
             cts = new CancellationTokenSource(); // support for cancellation
             TextBox_Status.Text = "Go";
             Task result = Task.Run(() => CWOBJ.InitiateDuelMode(cts.Token), cts.Token);
-            
+
             try
             {
                 await result;
@@ -57,7 +57,7 @@ namespace USB_Trafficlight
         }
 
         private async void Button_Reset_Click(object sender, RoutedEventArgs e)
-        {   
+        {
             button_reset.IsEnabled = false;
             if (cts != null)
             {
