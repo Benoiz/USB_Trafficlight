@@ -12,6 +12,7 @@ namespace USB_Trafficlight
         private const int PREPARATION_TIME = 60000;
         private const int AVERTED_TIME = 7000;
         private const int FACED_TIME = 3000;
+        private const int AFTERMATH_TIME = 5000;
 
         public Duel_Mode()     //contructor that is called when class is intantiated
         {
@@ -69,6 +70,13 @@ namespace USB_Trafficlight
                 await Task.Delay(FACED_TIME, ct);
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0); // and off
             }
+            
+            // orange light on for 5 secs to signal ending
+            
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
+            await Task.Delay(AFTERMATH_TIME, ct);
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0); // and off
+
             return "done";
 
         }
