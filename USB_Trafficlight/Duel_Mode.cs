@@ -60,7 +60,7 @@ namespace USB_Trafficlight
 
             //loop of 5 because of 5 rounds
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
                 await Task.Delay(AVERTED_TIME, ct);
@@ -70,9 +70,13 @@ namespace USB_Trafficlight
                 await Task.Delay(FACED_TIME, ct);
                 CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0); // and off
             }
+
+            //show red light after the last green phase
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
+            await Task.Delay(AVERTED_TIME, ct);
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0); // and off
             
             // orange light on for 5 secs to signal ending
-            
             CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
             await Task.Delay(AFTERMATH_TIME, ct);
             CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0); // and off
