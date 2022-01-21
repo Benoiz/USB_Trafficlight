@@ -7,10 +7,21 @@
         mc:Ignorable="d"
         Title="Duel Mode Training Sofware" Height="250" Width="300" MinHeight="250" MinWidth="300" Closing="MainWindow_Closing">
     <Grid>
-        <Button x:Name="button_start" Content="Start" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Margin="22,76,0,0" Height="88" Click="Button_Start_Click"/>
-        <Label x:Name="label_status" Content="Status:" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,16,0,0" Width="70" Height="32" FontFamily="Consolas" />
-        <Button x:Name="button_exit" Content="Exit" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="195,133,0,0" Click="Button_Exit_Click"/>
-        <Button x:Name="button_reset" Content="Reset" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="195,76,0,0" Click="Button_Reset_Click"/>
-        <TextBox x:Name="TextBox_Status" HorizontalAlignment="Left" Height="20" Margin="97,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="173" FontFamily="Consolas" FontSize="14" IsReadOnly="True" TextAlignment="Center"/>
+        <Button x:Name="button_start" Content="Start" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="140" Margin="22,117,0,0" Height="88" Click="Button_Start_Click"/>
+        <Button x:Name="button_exit" Content="Exit" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="195,174,0,0" Click="Button_Exit_Click"/>
+        <Button x:Name="button_reset" Content="Reset" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="195,117,0,0" Click="Button_Reset_Click"/>
+        <TextBox x:Name="TextBox_Zeit" HorizontalAlignment="Left" Height="20" Margin="195,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" FontFamily="Consolas" FontSize="14" IsReadOnly="True" TextAlignment="Center"/>
+        <ComboBox x:Name="Auswahl" HorizontalAlignment="Left" Margin="22,59,0,0" VerticalAlignment="Top" Width="248" SelectionChanged="Auswahl_SelectionChanged" SelectedIndex="0" IsEnabled="True" HorizontalContentAlignment="Center" Height="24">
+            <ComboBoxItem Content="5x3/7"/>
+            <ComboBoxItem Content="150s"/>
+            <ComboBoxItem Content="50s (Finale)"/>
+            <ComboBoxItem Content="20s"/>
+            <ComboBoxItem Content="10s"/>
+            <ComboBoxItem Content="8s"/>
+            <ComboBoxItem Content="6s"/>
+            <ComboBoxItem Content="4s"/>
+            <ComboBoxItem Content="5min"/>
+        </ComboBox>
+        <TextBox x:Name="TextBox_Status" HorizontalAlignment="Left" Height="20" Margin="22,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="156" FontFamily="Consolas" FontSize="14" IsReadOnly="True" TextAlignment="Center"/>
     </Grid>
 </Window>

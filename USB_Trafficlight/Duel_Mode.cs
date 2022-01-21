@@ -2,19 +2,19 @@
 using System.Windows;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace USB_Trafficlight
 {
     public class Duel_Mode
     {
         private readonly IntPtr cwObj = default;
+        DispatcherTimer dt = new DispatcherTimer();
+        Stopwatch sw = new Stopwatch();
+        string currentTime = string.Empty;
 
-        private const int PREPARATION_TIME = 60000;
-        private const int AVERTED_TIME = 7000;
-        private const int FACED_TIME = 3000;
-        private const int AFTERMATH_TIME = 5000;
-
-        public Duel_Mode()     //contructor that is called when class is intantiated
+        public Duel_Mode()     //constructor initializes connection to device
         {
             try
             {
@@ -45,43 +45,57 @@ namespace USB_Trafficlight
                 MessageBox.Show(e.Message);
                 Environment.Exit(1);
             }
+
+            dt.Tick += new EventHandler(dt_tick); //calls delegate
+            //ChangeTextboxStatus("Bitte Modus auswählen!"); //null pointer
+
         }
 
-        public async Task<string> InitiateDuelMode(CancellationToken ct)
+        public async Task<string> StartDuel(CancellationToken ct, int preparation_time, int pause_time, int shoot_time, int reps)
         {
 
             if (ct.IsCancellationRequested) // Is cancellation request already true
             {
                 ct.ThrowIfCancellationRequested();
             }
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
-            await Task.Delay(PREPARATION_TIME, ct);
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0); // and off
+
+            StartWatch(); // Show preparation time
+
+            ChangeTextboxStatus("Vorbereitung");
+            await OrangeOn(ct, preparation_time);
 
             //loop of 5 because of 5 rounds
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < reps; i++)
             {
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
-                await Task.Delay(AVERTED_TIME, ct);
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0); // and off
+                ChangeTextboxStatus("Pause " + (i + 1));
+                ResetWatch();
+                StartWatch();
+                await RedOn(ct, pause_time);
 
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 1); //turning the green light on
-                await Task.Delay(FACED_TIME, ct);
-                CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0); // and off
+                ChangeTextboxStatus("Schuss " + (i + 1));
+                ResetWatch();
+                StartWatch();
+                await GreenOn(ct, shoot_time);
             }
 
-            //show red light after the last green phase
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1); //turning the red light on
-            await Task.Delay(AVERTED_TIME, ct);
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0); // and off
-            
-            // orange light on for 5 secs to signal ending
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1); //turning the orange light on
-            await Task.Delay(AFTERMATH_TIME, ct);
-            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0); // and off
 
-            return "done";
+            ChangeTextboxStatus("");
+            ResetWatch();
+            StartWatch();
+            //show red light after the last green phase
+            await RedOn(ct, 7); //needed or can it be skipped;
+
+            ResetWatch();
+            StartWatch();
+            // orange light on for 5 secs to signal ending
+            ChangeTextboxStatus("Ende");
+            await OrangeOn(ct, 5);
+
+            StopWatch();
+            ResetWatch();
+
+            return "Fertig";
 
         }
 
@@ -89,6 +103,8 @@ namespace USB_Trafficlight
         {
             await Task.Run(() =>
             {
+                ResetWatch();
+                StopWatch();
                 int devCount = CwUSB.FCWOpenCleware(cwObj);
 
                 if (devCount >= 1)
@@ -105,6 +121,7 @@ namespace USB_Trafficlight
         {
             await Task.Run(() =>
             {
+                StopWatch();
                 int devCount = CwUSB.FCWOpenCleware(cwObj);
 
                 if (devCount >= 1)
@@ -114,6 +131,70 @@ namespace USB_Trafficlight
                 }
             });
 
+        }
+
+
+        // Next methods are single lights turned on for some time and then turned off. argument time in seconds.
+        public async Task GreenOn(CancellationToken ct,int time)
+        {
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 1);
+            await Task.Delay(time * 1000, ct);
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_2, 0);
+        }
+
+        public async Task OrangeOn(CancellationToken ct, int time)
+        {
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 1);
+            await Task.Delay(time * 1000, ct);
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_1, 0);
+        }
+
+        public async Task RedOn(CancellationToken ct, int time)
+        {
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 1);
+            await Task.Delay(time * 1000, ct);
+            CwUSB.FCWSetSwitch(cwObj, 0, (int)CwUSB.SWITCH_IDs.SWITCH_0, 0);
+        }
+
+        void ChangeTextboxZeit(string txt)
+        {
+            MainWindow.AppWindow.Dispatcher.BeginInvoke(new Action(() => MainWindow.AppWindow.TextBox_Zeit.Text = txt));
+        }
+
+        void dt_tick(object sender, EventArgs e) //delegate
+        {
+            if (sw.IsRunning)
+            {
+                TimeSpan ts = sw.Elapsed;
+                currentTime = string.Format("{1:00}:{2:00}",
+                ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                ChangeTextboxZeit(string.Concat(currentTime));
+            }
+        }
+
+        private void StartWatch()
+        {
+            sw.Start();
+            dt.Start();
+        }
+
+        private void StopWatch()
+        {
+            if (sw.IsRunning)
+            {
+                sw.Stop();
+            }
+        }
+
+        private void ResetWatch()
+        {
+            sw.Reset();
+            ChangeTextboxZeit("00:00");
+        }
+
+        private void ChangeTextboxStatus(string text)
+        {
+            MainWindow.AppWindow.Dispatcher.BeginInvoke(new Action(() => MainWindow.AppWindow.TextBox_Status.Text = text));
         }
     }
 }
