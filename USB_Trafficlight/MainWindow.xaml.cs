@@ -41,31 +41,31 @@ namespace USB_Trafficlight
             switch (switchCase)
             {
                 case 0:
-                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 6, 7, 3, 5));
+                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 3, 5));
                     break;
                 case 1:
-                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 150, 1));
+                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 150, 1));
                         break;
                 case 2:
-                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 50, 1));
+                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 50, 1));
                         break;
                 case 3:
-                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 20, 1));
+                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 20, 1));
                         break;
                 case 4:
-                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 10, 1));
+                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 10, 1));
                         break;
                 case 5:
-                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 8, 1));
+                    result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 8, 1));
                         break;
                 case 6:
-                     result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 6, 1));
+                     result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 6, 1));
                         break;
                 case 7:
-                     result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 4, 1));
+                     result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 4, 1));
                         break;
                 case 8:
-                     result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 5, 300, 1));
+                     result = Task.Run(() => CWOBJ.StartDuel(cts.Token, 60, 7, 300, 1));
                         break;
                     default:
                     result = default;

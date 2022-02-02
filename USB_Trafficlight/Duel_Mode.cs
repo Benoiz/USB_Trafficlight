@@ -167,7 +167,7 @@ namespace USB_Trafficlight
             {
                 TimeSpan ts = sw.Elapsed;
                 currentTime = string.Format("{1:00}:{2:00}",
-                ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                ts.Minutes, ts.TotalSeconds, ts.Milliseconds / 10);
                 ChangeTextboxZeit(string.Concat(currentTime));
             }
         }
